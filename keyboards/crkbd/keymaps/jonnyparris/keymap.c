@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdio.h>
 
 enum layers {
-  _QWERTY,
+  _COLEMAK,
   _NUMS,
   _SYMS,
-  _COLEMAK
+  _QWERTY
 };
 
 // TODO - maybe
@@ -66,11 +66,11 @@ enum via_keycodes {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-	[_QWERTY] = LAYOUT_split_3x6_3(
-        RGB_TOG,     KC_Q,       KC_W,       KC_E,       KC_R,       KC_T,            KC_Y,      KC_U,       KC_I,       KC_O,       KC_P,       RGB_TOG,
-        KC_LCAP,    KC_A,       KC_S,       KC_D,       KC_F,       KC_G,            KC_H,      KC_J,       KC_K,       KC_L,       KC_SCLN,    KC_QUOT,
-        KC_LCTL,    KC_Z,       KC_X,       KC_C,       KC_V,       KC_B,            KC_N,      KC_M,       KC_COMM,    KC_DOT,     KC_SLSH,    DF(3),
-                        MT(MOD_LSFT,KC_ESC), SPC_FN1, MT(MOD_LGUI,KC_TAB),           KC_SFTENT, MT(MOD_LALT,KC_BSPC),   FN_MO23),
+	[_COLEMAK] = LAYOUT_split_3x6_3(
+        KC_ESC,     KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,            KC_J,      KC_L,       KC_U,       KC_Y,       KC_SCLN,    RGB_TOG,
+        KC_LCAP,    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,            KC_M,      KC_N,       KC_E,       KC_I,       KC_O,       KC_QUOT,
+        KC_LCTL,    KC_Z,       KC_X,       KC_C,       KC_D,       KC_V,            KC_K,      KC_H,       KC_COMM,    KC_DOT,     KC_SLSH,    DF(3),
+                        MT(MOD_LSFT,KC_ESC), SPC_FN1, MT(MOD_LGUI,KC_TAB),           KC_SFTENT, MT(MOD_RALT,KC_BSPC),  FN_MO23),
 	[_NUMS] = LAYOUT_split_3x6_3(
         QK_BOOT,    KC_1,       KC_2,       KC_3,       KC_4,       KC_5,            KC_6,      KC_7,       KC_8,       KC_9,       KC_0,       KC_TRNS,
         KC_TRNS,    KC_MPRV,    KC_MPLY,    KC_MNXT,    MACRO_8,    MACRO_1,         KC_LEFT,   KC_DOWN,    KC_UP,      KC_RGHT,    KC_NO,      QK_BOOT,
@@ -81,11 +81,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_TRNS,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,           KC_MINS,   KC_EQL,     KC_LBRC,    KC_RBRC,    KC_BSLS,    KC_GRV,
         KC_TRNS,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,           KC_UNDS,   KC_PLUS,    KC_LCBR,    KC_RCBR,    KC_PIPE,    KC_TILD,
                                             KC_TRNS,    KC_TRNS,    KC_TRNS,         KC_TRNS,   KC_TRNS,    KC_RALT),
-	[_COLEMAK] = LAYOUT_split_3x6_3(
-        KC_TRNS,    KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,            KC_J,      KC_L,       KC_U,       KC_Y,       KC_SCLN,    KC_TRNS,
-        KC_TRNS,    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,            KC_M,      KC_N,       KC_E,       KC_I,       KC_O,       KC_QUOT,
-        KC_TRNS,    KC_Z,       KC_X,       KC_C,       KC_D,       KC_V,            KC_K,      KC_H,       KC_COMM,    KC_DOT,     KC_SLSH,    QK_DEF_LAYER,
-                                            KC_TRNS,    SPC_FN1,    KC_TRNS,         KC_SFTENT, KC_TRNS,    KC_RALT)
+	[_QWERTY] = LAYOUT_split_3x6_3(
+        KC_ESC,     KC_Q,       KC_W,       KC_E,       KC_R,       KC_T,            KC_Y,      KC_U,       KC_I,       KC_O,       KC_P,       RGB_TOG,
+        KC_LCAP,    KC_A,       KC_S,       KC_D,       KC_F,       KC_G,            KC_H,      KC_J,       KC_K,       KC_L,       KC_SCLN,    KC_QUOT,
+        KC_LCTL,    KC_Z,       KC_X,       KC_C,       KC_V,       KC_B,            KC_N,      KC_M,       KC_COMM,    KC_DOT,     KC_SLSH,    QK_DEF_LAYER,
+                        MT(MOD_LSFT,KC_ESC), SPC_FN1, MT(MOD_LGUI,KC_TAB),           KC_SFTENT, MT(MOD_RALT,KC_BSPC),   KC_RALT)
 };
 
 #ifdef OLED_ENABLE
@@ -261,7 +261,7 @@ void render_layer_icon(void) {
 #define L_BASE 0
 #define L_NUMS 2
 #define L_SYMS 4
-#define L_COLEMAK 8
+#define L_ALT 8
 
 void render_layer_name(void) {
     switch (layer_state) {
@@ -274,11 +274,11 @@ void render_layer_name(void) {
         case L_SYMS:
             oled_write_ln_P(PSTR("SYMBOLS"), false);
             break;
-        case L_COLEMAK:
-        case L_COLEMAK|L_NUMS:
-        case L_COLEMAK|L_SYMS:
-        case L_COLEMAK|L_NUMS|L_SYMS:
-            oled_write_ln_P(PSTR("ALT_LAYOUT"), false);
+        case L_ALT:
+        case L_ALT|L_NUMS:
+        case L_ALT|L_SYMS:
+        case L_ALT|L_NUMS|L_SYMS:
+            oled_write_ln_P(PSTR("QWERTY"), false);
             break;
     }
 }
