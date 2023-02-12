@@ -31,22 +31,15 @@ enum layers {
 // Dual function escape with left command
 // #define KC_LGESC LGUI_T(KC_ESC)
 
-// enum custom_keycodes {
-//   QWERTY = SAFE_RANGE,
-//   LOWER,
-//   RAISE,
-//   ADJUST,
-//   RGBRST,
-//   KC_RACL // right alt / colon
-// };
+bool is_cmd_tab_active = false;
+uint16_t cmd_tab_timer = 0;
 
 #define SPC_FN1 LT(1, KC_SPC)
 #define SPC_FN2 LT(2, KC_SPC)
 #define SPC_FN3 LT(3, KC_SPC)
 
-enum via_keycodes {
-    FN_MO13 = QK_MACRO,
-    FN_MO23,
+enum custom_keycodes {
+    CMD_TAB = SAFE_RANGE,
     MACRO_0,
     MACRO_1,
     MACRO_2,
@@ -67,22 +60,22 @@ enum via_keycodes {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	[_COLEMAK] = LAYOUT_split_3x6_3(
-        KC_ESC,     KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,            KC_J,      KC_L,       KC_U,       KC_Y,       KC_SCLN,    RGB_TOG,
-        KC_LCAP,    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,            KC_M,      KC_N,       KC_E,       KC_I,       KC_O,       KC_QUOT,
+        CMD_TAB,    KC_Q,       KC_W,       KC_F,       KC_P,       KC_B,            KC_J,      KC_L,       KC_U,       KC_Y,       KC_SCLN,    RGB_TOG,
+        KC_CAPS,    KC_A,       KC_R,       KC_S,       KC_T,       KC_G,            KC_M,      KC_N,       KC_E,       KC_I,       KC_O,       KC_QUOT,
         KC_LCTL,    KC_Z,       KC_X,       KC_C,       KC_D,       KC_V,            KC_K,      KC_H,       KC_COMM,    KC_DOT,     KC_SLSH,    DF(3),
-                        MT(MOD_LSFT,KC_ESC), SPC_FN1, MT(MOD_LGUI,KC_TAB),           KC_SFTENT, MT(MOD_RALT,KC_BSPC),  FN_MO23),
+                        MT(MOD_LSFT,KC_ESC), SPC_FN1, MT(MOD_LGUI,KC_TAB),           KC_SFTENT, MT(MOD_RALT,KC_BSPC),  TT(2)),
 	[_NUMS] = LAYOUT_split_3x6_3(
         QK_BOOT,    KC_1,       KC_2,       KC_3,       KC_4,       KC_5,            KC_6,      KC_7,       KC_8,       KC_9,       KC_0,       KC_TRNS,
         KC_TRNS,    KC_MPRV,    KC_MPLY,    KC_MNXT,    MACRO_8,    MACRO_1,         KC_LEFT,   KC_DOWN,    KC_UP,      KC_RGHT,    KC_NO,      QK_BOOT,
         KC_TRNS,    KC_MUTE,    KC_VOLD,    KC_VOLU,    MACRO_7,    MACRO_2,         MACRO_0,   MACRO_4,    MACRO_3,    MACRO_5,    MACRO_6,    KC_NO,
                                             KC_TRNS,    KC_TRNS,    KC_TRNS,         KC_RGUI,   KC_TRNS,    KC_TRNS),
 	[_SYMS] = LAYOUT_split_3x6_3(
-        KC_TRNS,    KC_EXLM,    KC_AT,      KC_HASH,    KC_DLR,     KC_PERC,         KC_CIRC,   KC_AMPR,    KC_ASTR,    KC_LPRN,    KC_RPRN,    KC_TRNS,
+        KC_TRNS,    KC_EXLM,    KC_AT,      KC_HASH,    KC_DLR,     KC_PERC,         KC_CIRC,   KC_AMPR,    KC_ASTR,    KC_LPRN,    KC_RPRN,    QK_BOOT,
         KC_TRNS,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,           KC_MINS,   KC_EQL,     KC_LBRC,    KC_RBRC,    KC_BSLS,    KC_GRV,
         KC_TRNS,    KC_NO,      KC_NO,      KC_NO,      KC_NO,      KC_NO,           KC_UNDS,   KC_PLUS,    KC_LCBR,    KC_RCBR,    KC_PIPE,    KC_TILD,
-                                            KC_TRNS,    KC_TRNS,    KC_TRNS,         KC_TRNS,   KC_TRNS,    KC_RALT),
+                                            KC_TRNS,    KC_TRNS,    KC_TRNS,         KC_TRNS,   KC_TRNS,    KC_TRNS),
 	[_QWERTY] = LAYOUT_split_3x6_3(
-        KC_ESC,     KC_Q,       KC_W,       KC_E,       KC_R,       KC_T,            KC_Y,      KC_U,       KC_I,       KC_O,       KC_P,       RGB_TOG,
+        CMD_TAB,    KC_Q,       KC_W,       KC_E,       KC_R,       KC_T,            KC_Y,      KC_U,       KC_I,       KC_O,       KC_P,       RGB_TOG,
         KC_LCAP,    KC_A,       KC_S,       KC_D,       KC_F,       KC_G,            KC_H,      KC_J,       KC_K,       KC_L,       KC_SCLN,    KC_QUOT,
         KC_LCTL,    KC_Z,       KC_X,       KC_C,       KC_V,       KC_B,            KC_N,      KC_M,       KC_COMM,    KC_DOT,     KC_SLSH,    QK_DEF_LAYER,
                         MT(MOD_LSFT,KC_ESC), SPC_FN1, MT(MOD_LGUI,KC_TAB),           KC_SFTENT, MT(MOD_RALT,KC_BSPC),   KC_RALT)
@@ -272,7 +265,7 @@ void render_layer_name(void) {
             oled_write_ln_P(PSTR("NUMS"), false);
             break;
         case L_SYMS:
-            oled_write_ln_P(PSTR("SYMBOLS"), false);
+            oled_write_ln_P(PSTR("SYMS"), false);
             break;
         case L_ALT:
         case L_ALT|L_NUMS:
@@ -332,45 +325,63 @@ bool oled_task_user(void) {
     render_mod_status_ctrl_shift(get_mods()|get_oneshot_mods());
     return false;
 }
+#endif // OLED_ENABLE
+
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    if (record->event.pressed) {
-        // set_keylog(keycode, record);
-
-        switch (keycode) {
-            case QK_MACRO_0:
-                SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_LEFT)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
-                return false;
-            case QK_MACRO_1:
-                SEND_STRING(SS_DOWN(X_RGUI)SS_DOWN(X_TAB)SS_TAP(X_TAB)SS_UP(X_TAB)SS_UP(X_RGUI));
-                return false;
-            case QK_MACRO_2:
-                SEND_STRING(SS_DOWN(X_RGUI)SS_TAP(X_GRV)SS_UP(X_RGUI));
-                return false;
-            case QK_MACRO_3:
-                SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_RGHT)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
-                return false;
-            case QK_MACRO_4:
-                SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_ENT)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
-                return false;
-            case QK_MACRO_5:
-                SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_C)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
-                return false;
-            case QK_MACRO_6:
-                SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_UP)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
-                return false;
-            case QK_MACRO_7:
-                SEND_STRING(SS_DOWN(X_LCTL)SS_TAP(X_L)SS_UP(X_LCTL));
-                return false;
-            case QK_MACRO_8:
-                SEND_STRING(SS_DOWN(X_LCTL)SS_TAP(X_W)SS_UP(X_LCTL));
-                return false;
-        }
+    switch (keycode) {
+        case MACRO_0:
+            SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_LEFT)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
+            return false;
+        case MACRO_1:
+            SEND_STRING(SS_DOWN(X_RGUI)SS_DOWN(X_TAB)SS_TAP(X_TAB)SS_UP(X_TAB)SS_UP(X_RGUI));
+            return false;
+        case MACRO_2:
+            SEND_STRING(SS_DOWN(X_RGUI)SS_TAP(X_GRV)SS_UP(X_RGUI));
+            return false;
+        case MACRO_3:
+            SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_RGHT)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
+            return false;
+        case MACRO_4:
+            SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_ENT)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
+            return false;
+        case MACRO_5:
+            SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_C)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
+            return false;
+        case MACRO_6:
+            SEND_STRING(SS_DOWN(X_LGUI)SS_DOWN(X_LALT)SS_DOWN(X_LCTL)SS_TAP(X_UP)SS_UP(X_LCTL)SS_UP(X_LALT)SS_UP(X_LGUI));
+            return false;
+        case MACRO_7:
+            SEND_STRING(SS_DOWN(X_LCTL)SS_TAP(X_L)SS_UP(X_LCTL));
+            return false;
+        case MACRO_8:
+            SEND_STRING(SS_DOWN(X_LCTL)SS_TAP(X_W)SS_UP(X_LCTL));
+            return false;
+        case CMD_TAB:
+            if (record->event.pressed) {
+                if (!is_cmd_tab_active) {
+                    is_cmd_tab_active = true;
+                    register_code(KC_LGUI);
+                }
+                cmd_tab_timer = timer_read();
+                register_code(KC_TAB);
+            } else {
+                unregister_code(KC_TAB);
+            break;
+            }
     }
-
+    // set_keylog(keycode, record);
     return true;
 };
-#endif // OLED_ENABLE
+
+void matrix_scan_user(void) { // The very important timer.
+  if (is_cmd_tab_active) {
+    if (timer_elapsed(cmd_tab_timer) > 1000) {
+      unregister_code(KC_LGUI);
+      is_cmd_tab_active = false;
+    }
+  }
+}
 
 int RGB_current_mode;
 
